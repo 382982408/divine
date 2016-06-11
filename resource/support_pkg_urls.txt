@@ -1,0 +1,4 @@
+#pkg_name	url
+data	ftp://184.57.17.188/divine/divine-0.1.1_data.tar.bz2
+python_libs	ftp://184.57.17.188/divine/divine-0.1.1_pylibs.tar.bz2
+example	ftp://184.57.17.188/divine/divine-0.1.1_examples.tar.bz2
