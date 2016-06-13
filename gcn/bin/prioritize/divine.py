@@ -901,7 +901,7 @@ class Divine:
 		cmd = ["cut","-f1,2",self.rank_fn,"|","grep","-v","'#'",">",rank_fn_tmp]
 		self.run_cmd(cmd, "extract_pred_rank")
 		
-		self.xls = self._assign_out_fn(job_name,'xls')
+		self.xls = self._assign_out_fn('divine','xls')
 		
 		cmd = ["python", self.entries['vcf2xls'], \
 					"-i", self.vcf, \
@@ -987,8 +987,8 @@ def main():
 	parser.add_argument('--hgmd', action='store_const', dest='hgmd', required=False, default=False, const=True, help='enable HGMD (requires a license) [False]')
 	parser.add_argument('-k', action='store', dest='vknown', required=False, default=1, type=int, help='apply variant-level pathogenic annotation (e.g., either ClinVar or HGMD) to prioritization strategy [1:Yes], 0:No')
 
-	parser.add_argument('--reuse_varant', action='store_const', dest='reuse_varant', required=False, default=False, const=True, help='Reuse previous annotation file (varant.vcf) if it is available [False]')
-	parser.add_argument('-c', dest='capkit', required=False, default='SureSelect_V6', help='capture kit symbol[SureSelect_V6]')
+	parser.add_argument('--reuse', action='store_const', dest='reuse', required=False, default=False, const=True, help='Reuse previous annotation file (divine.vcf) if it is available [False]')
+	parser.add_argument('-c', dest='capkit', required=False, default='SureSelect_V6', help='capture kit symbol [SureSelect_V6]')
 		
 	args = parser.parse_args()
 	
@@ -1017,7 +1017,7 @@ def main():
 		lib_utils.msgout('notice',msg); dv.logger.info(msg)
 
 		# to create an instance of varant
-		dv.vannotate(args.reuse_varant)
+		dv.vannotate(args.reuse)
 		
 		# to apply basic filter/tagging variant class
 		dv.vfilter()

@@ -1,6 +1,6 @@
 #!/bin/bash -l
-export SRC=/media/hong/blackedge/projects/apps
-export DST=/media/hong/redfish/projects/apps
+export SRC=$1
+export DST=$2
 
 rsync -ravP $SRC/divine/gcn $DST/divine/
 rsync -ravP $SRC/divine/python_libs $DST/divine/
