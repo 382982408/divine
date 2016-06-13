@@ -3,7 +3,7 @@
 author: changjin.hong@gmail.com
 '''
 
-import os, sys, urllib, requests, argparse, shutil, imp, re
+import os, sys, urllib, argparse, shutil, imp, re
 import subprocess as sp
 
 VERSION = '0.1.1'

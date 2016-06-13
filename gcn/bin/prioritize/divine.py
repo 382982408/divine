@@ -721,6 +721,11 @@ class Divine:
 			stdefp = sp.PIPE
 		proc = sp.Popen(cmd_str, stdout=stdofp, stderr=stdefp, shell=True)
 		retcode = proc.wait()
+		
+		if job_name:
+			stdofp.close()
+			stdefp.close()
+			
 		if retcode > 0:
 			self.logger.error('[%s] failed' % cmd_str)
 			raise RuntimeError('[%s] failed' % cmd_str)
