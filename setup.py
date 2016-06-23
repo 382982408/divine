@@ -262,7 +262,6 @@ def main():
 			raise RuntimeError('it requires network connection to setup Divine!')
 		if args.update_db:
 			cs.download_data()
-		cs.uninstall_python_libs()
 		cs.install_python_libs()
 		cs.msg_config('install')
 	elif args.uninstall:
