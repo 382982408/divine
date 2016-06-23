@@ -70,16 +70,10 @@ class AnnotPline:
         'Annotate the VCF using VARANT'
         self.logger.info('Input file = %s, Output file = %s' %
                          (self.invcf, self.outvcf))
-        try:
-            annotator.main(self.invcf, self.outvcf, self.capture_kit_name, self.probe_ext_bp, hgmd_on, self.logger)
-            d = 'Annotation complete [%s;%s].'%(self.invcf,self.outvcf)
-            self.logger.info(d)
-            print d
-        except:
-            d = 'Annotation failed [%s;%s]!'%(self.invcf,self.outvcf)
-            self.logger.error(d)
-            print d
-            raise RuntimeError(d)
+        annotator.main(self.invcf, self.outvcf, self.capture_kit_name, self.probe_ext_bp, hgmd_on, self.logger)
+        d = 'Annotation complete [%s;%s].'%(self.invcf,self.outvcf)
+        print d
+        self.logger.info(d)
 
 def main():
     """Main script to annotate VCF file"""

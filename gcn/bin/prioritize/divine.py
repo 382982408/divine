@@ -156,8 +156,8 @@ class Divine:
 
 		#record user command line
 		self.record_commandline()
-		
-		lib_utils.msgout('notice','Done, input condition stored.',job_name)
+		msg = 'Divine initialization completed [%s]'%job_name
+		lib_utils.msgout('notice',msg);self.logger.info(msg)
 
 	def _set_config(self, section, entry):
 		'''
@@ -214,7 +214,7 @@ class Divine:
 				raise IOError('check [%s = %s] in the file [%s]' %\
 										(key, path2, self.config_fn))
 
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 		
 		return self.entries
@@ -251,7 +251,7 @@ class Divine:
 		
 		self.logger.info('exclude_non_coding:%s'%self.excl_non_coding)
 		
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 		
 	def hpo_to_diseases(self):
@@ -280,7 +280,7 @@ class Divine:
 
 		self.run_cmd(cmd, job_name)
 		
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 	
 	def disease_to_genes_sum(self,gene_norm=True):
@@ -331,7 +331,7 @@ class Divine:
 		#print phenotypic damage scores
 		self.rank_pheno_gene()
 
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 
 		#clean up variables
@@ -381,7 +381,7 @@ class Divine:
 		#print phenotypic damage scores
 		self.rank_pheno_gene()
 
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 
 		#clean up variables
@@ -426,13 +426,13 @@ class Divine:
 			if self.capkit:
 				cmd.extend(["-c", self.capkit, "-e", "180"])
 
-			self.run_cmd(cmd)
+			self.run_cmd(cmd,job_name)
 		self.vcf = varant_vcf
 		
 		if coding_vcf:
 			os.unlink(coding_vcf)
 		
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 	
 	def vfilter(self):
@@ -463,7 +463,7 @@ class Divine:
 		self.run_cmd(cmd, job_name)
 		self.vcf = filtered_vcf
 		
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 	
 	def _store_variants(self,beta_fits):
@@ -697,7 +697,7 @@ class Divine:
 
 		self.genetic_dmg = lib_utils.normalize_dic(genes_to_infer2, 'sum')
 		
-		msg = 'done.[%s]' % job_name
+		msg = 'done. [%s]' % job_name
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 		
 		#clean up
@@ -841,7 +841,8 @@ class Divine:
 		
 		msg='Total %d perturbed genes are added by phenotype gene enrichment!\ndone. [%s]'%(P_delta,job_name)
 		lib_utils.msgout('notice',msg); self.logger.info(msg)
-		lib_utils.msgout('notice','genes enriched by GO:[%s]'%lib_utils.joined(pheno_delta,','))
+		msg='genes enriched by GO:[%s]'%lib_utils.joined(pheno_delta,',')
+		lib_utils.msgout('notice',msg); self.loger.info(msg)
 
 	def combine_damage_scores(self):
 

@@ -359,6 +359,10 @@ def HgmdDB():
     """Return an instance of `SNPDB` configured to search HGMD professional database"""
     return SNPDB('HGMDDB')
 
+def ClinvitaeDB():
+    """Return an instance of `SNPDB` configured to search CLINVITAE database"""
+    return SNPDB('CLINVITAE')
+   
 def EspDB():
     """Return an instance of `SNPDB` configured to search the Exome
     Sequencing Project's(ESP) database"""
@@ -366,7 +370,7 @@ def EspDB():
 
 def ExACDB():
     """Return an instance of 'SNPDB' configured to search the ExAC database"""
-    return SNPDB('EXAC')  
+    return SNPDB('EXAC')
 
 if __name__ == '__main__':
     clnvar = ClinvarDB()

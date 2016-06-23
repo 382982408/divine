@@ -116,17 +116,17 @@ def file2list(fn,upper=False):
 	fp.close()
 	return myList
 
-def file_tag2(filename,tag,newFileExt):
+def file_tag2(filename,tag,newExt):
 	D,_,fBase,fExt = separateDirFn2(filename)
-	if not newFileExt:
-		newFileExt=fExt
+	if not newExt:
+		newExt=fExt
 	if not tag:
 		taggedFn='%s/%s' % (D,fBase)
 	else:
 		taggedFn='%s/%s_%s' % (D,fBase,tag)
 
-	if newFileExt:
-		taggedFn='%s.%s' % (taggedFn,newFileExt)
+	if newExt:
+		taggedFn='%s.%s' % (taggedFn,newExt)
 	if filename == taggedFn:
 		msgout('warning','tag file name[%s] is same as the original input [%s]' % (taggedFn,filename))
 	return taggedFn
@@ -329,21 +329,20 @@ def get_work_directory(prefix='divine'):
       new_created = True
   return workD
 
-# def dic_to_file(myDic,out_fn):
-# 
-# 	for val in myDic.values():
-# 		try:
-# 			if isinstance(val,float) or isinstance(val,int):
-# 				ptrfmt = 'number'
-# 		except:
-# 			ptrfmt = 'string'
-# 		break
-# 	
-# 	fp2 = open(out_fn,'w')
-# 	if ptrfmt=='number':
-# 		for key,val in myDic.iteritems():
-# 			fp2.write('%s\t%g\n'%(key,val))
-# 	elif ptrfmt=='string':
-# 		for key,val in myDic.iteritems():
-# 			fp2.write('%s\t%s\n'%(key,val))
-# 	fp2.close()
+def file_tag(filename,tag,newExt):
+	D,_,fBase,fExt = separateDirFn2(filename)
+	if not newExt:
+		newExt=fExt
+
+	if tag:
+		taggedFn='%s/%s_%s' % (D,fBase,tag)
+	else:
+		taggedFn='%s/%s' % (D,fBase)
+
+	if newExt:
+		taggedFn='%s.%s' % (taggedFn,newExt)
+		
+	if filename == taggedFn:
+		gen_msg_time('warning','tag file name[%s] is same as the original input [%s]' %\
+								(taggedFn,filename),'file_tag2')
+	return taggedFn

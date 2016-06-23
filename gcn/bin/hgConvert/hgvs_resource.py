@@ -41,21 +41,24 @@ CHROMOSOMES, ICHROMOSOMES = get_ucsc_chrom()
 
 class Hgvs2:
 
-    def __init__(self):
+    def __init__(self,refseq_fn=fileconfig.FILECONFIG['REFGENE']):
         """ register hg19 reference genome sequence and NCBI RefSeq transcript coordinates"""
         self.genome_fn = fileconfig.FILECONFIG['REFGENOME_UCSC']
         self.genome = None
         if not os.path.exists(self.genome_fn):
           raise IOError('Reference Genome Sequence (UCSC format) for %s is not found'%self.genome_fn)
 
-        self.refseq_fn = fileconfig.FILECONFIG['REFGENE']
+        self.refseq_fn = refseq_fn
         self.refseq = None
         if not os.path.exists(self.refseq_fn):
           raise IOError('NCBI RefSeq transcript for %s is not found'%self.refseq_fn)
         
     def get_transcript(self, name):
-        return self.refseq.get(name)
-  
+        if self.refseq:
+            return self.refseq.get(name)
+        else:
+            raise RuntimeError('first, load a transcript coordinate file![%s]'%self.refseq_fn)
+
     def load_resource(self):
         #load genome sequence
         print 'loading the genome sequence [%s] for HGVS...' % self.genome_fn
@@ -65,12 +68,13 @@ class Hgvs2:
         #load refseq into dic
         print 'loading the refseq transcript [%s] for HGVS...' % self.refseq_fn
         fp = open(self.refseq_fn,'r')
-        self.refseq = pyhgvs.utils.read_transcripts(fp)    
+        self.refseq = pyhgvs.utils.read_transcripts(fp)
         fp.close()
         print 'done.'
     
     def close_resource(self):
       self.genome.close()
+      self.refseq = None
     
     def to_cDNA(self, chrom, offset, ref, alt, refseq_acc):
         """ convert to HGVS nomenclature """
@@ -93,6 +97,20 @@ class Hgvs2:
             return hgvs_name
         else:
           return None
+         
+    def gdna_to_vcf(self,gdna):
+        return pyhgvs.gdna_to_vcf(gdna,self.genome)
+       
+    def to_chrom_coordinate(self,cDNA):
+        try:
+            chrom, offset, ref, alt = pyhgvs.parse_hgvs_name(cDNA, self.genome, \
+                                       get_transcript = self.get_transcript)
+
+            return chrom, offset, ref, alt
+        except:
+            print "[%s] cannot be coverted to chromosome coordinate"%cDNA
+            return None, None, None, None
+
 
 if __name__ in "__main__":
     hgvs2 = Hgvs2()

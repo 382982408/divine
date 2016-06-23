@@ -40,6 +40,12 @@ Divine requires the following modules and, during the setup process, the modules
 - [*] is already included in the Divine package.
 
 ## Install
+
+download divine source codes from github
+```
+$ git clone https://github.com/cjhong/divine.git
+```
+
 ### Option 1: fresh install or to upgrade Divine resource package
 
 It requires downloading 15GB files and so be patient!
@@ -143,7 +149,7 @@ TWIST1  0.000605784
 ### Annotated VCF files
 - `divine.vcf`
 
-	This is a VCF file annotated by Varant where we improve the original method significantly. Refer to Varnat website (http://compbio.berkeley.edu/proj/varant).
+	This is a VCF file annotated by Varant where we improve the original method significantly. Refer to Varant website (http://compbio.berkeley.edu/proj/varant).
 
 - `vfilter.vcf`
 
@@ -227,10 +233,9 @@ optional arguments:
 
 # FAQ
 
-## Computational Time
 - Q.1: I have a VCF file generated from either WGS or WES dataset and the number of variants is a lot! It sems that Divine is slow and I want to have a result as soon as possible.
 
-- A.1: Depending on your hardware specification and the number of variants in an input VCF file, the computational time varies. In my computer setting (e.g., Intel Core 2 Duo @ 2.93GHz), it takes 25 to 30 min to handle 370,000 variants. We are actively working on Divine to speed up the process. For now, you can make the process faster by focusing only NCBI RefGene with +/-20bp flanking from each exon boundary. However, be aware that it may not detect a pathogenic variant in intergenic region or up/downstream.
+- A.1: Depending on your hardware specification and the number of variants in an input VCF file, the computational time varies. In my computer setting (e.g., Intel Core 2 Duo @ 2.93GHz), it takes 30 min to handle 37,000 variants. The computational bottleneck is directly associated with hard disk drive I/O. HDD connected to USB 3.0 or SDD (solid-state drive) can be helpful. Also, we are actively working on Divine to speed up the process. For now, you can make the process faster by focusing only NCBI RefGene with +/-20bp flanking from each exon boundary. However, be aware that it may not detect a pathogenic variant in intergenic region or up/downstream.
 
 ```
 $ divine.py -q dir_to_the_hpo/P0004.hpo -v dir_to_the_vcf/P0004.vcf \
@@ -247,7 +252,7 @@ $ divine.py -q dir_to_the_hpo/P0004.hpo -v dir_to_the_vcf/P0004.vcf \
 
 - Q.4: Previously, I ran Divine on a patient sample dataset which took so long. Now, I want to prioritize genes with a different setting (e.g., filtering condition or a different option in `divine.py`) and I am sure that I didn't update Divine/GCN database. How I can make the repeat analysis faster?
 
-- A.4: Unless Divine database is changed, or purchase HGMD license newly, or divine.vcf created previously is corrupted, you can reuse the previous annotated VCF file using --reuse. If you want to compare a new result with the previous one, try
+- A.4: Unless Divine database is changed, or purchase HGMD license newly, or divine.vcf created previously is corrupted, you can reuse the previous annotated VCF file using `--reuse`. If you want to compare a new result with the previous one, try
 
 ```
 $ $DIVINE/gcn/bin/prioritize/divine.py -q dir_to_the_hpo/P0005.hpo \
@@ -280,7 +285,7 @@ $ $DIVINE/gcn/bin/prioritize/divine.py -q dir_to_the_hpo/P0005.hpo \
 
 - Q.11: What is the memory requirement?
 
-- A.11: In Varant annotation step, memory usage peaks around 3 to 4GB.
+- A.11: In Varant annotation step, memory usage peaks around 1.5GB.
 
 - Q.12: My company wants to use Divine.
 
@@ -294,9 +299,14 @@ $ $DIVINE/gcn/bin/prioritize/divine.py -q dir_to_the_hpo/P0005.hpo \
 $ your_divine_command 2>&1 | tee divine_err.log
 ```
 
+- Q.14: Can Divine detect a gene previously never known to be associated with a certain disease?
+
+- A.14: This is challenging task but it is essential. Currently, Divine uses gene ontology enrichment and also it applies a system biology approach to detect de novo disease-causing gene.
+
+
 # Change Log
 - v.0.1.1 (June 15 2016)
-	- Original release
+	- Original release, Clinvitae(http://clinvitae.invitae.com/) added
 
 # License
 GNU GENERAL PUBLIC LICENSE

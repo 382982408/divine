@@ -190,7 +190,7 @@ def main():
                         help='Name of sqlite database to create')
     parser.add_argument('-n', '--name', dest='dbname', type=str,
                         help='Name of the db to be created - ' +
-                        'CLINVARDB, HGMDDB, DBSNP, KGDB, ESP, EXAC')
+                        'CLINVARDB, HGMDDB, DBSNP, KGDB, ESP, EXAC, etc')
     parser.add_argument('--force', action='store_true',
                         help='Create new database even if the existing one ' +
                              'is newer than *inname*')

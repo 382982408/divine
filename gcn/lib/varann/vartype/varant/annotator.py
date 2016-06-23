@@ -28,6 +28,7 @@ from gcn.lib.databases.regulomedb import Regulomedb
 from gcn.lib.databases.mirna import MiRna
 from gcn.lib.databases.splicedb import Splicedb
 from gcn.lib.databases.snpdb import ClinvarDB
+from gcn.lib.databases.snpdb import ClinvitaeDB
 from gcn.lib.databases.snpdb import HgmdDB
 from gcn.lib.databases.snpdb import DBSNP
 from gcn.lib.databases.snpdb import KGDB
@@ -73,7 +74,9 @@ class SNPAnnotation():
             self.hgmd_on = False
         else:
           self.hgmd_on = False
-          
+        
+        self.clinvtdb = ClinvitaeDB()
+        
         self.NO_HGMD,self.HGMD_GENE,self.HGMD_POS,self.HGMD_ALT = range(4)
         self.kgdb = KGDB()
         self.dbsnp = DBSNP()
@@ -496,8 +499,7 @@ class SNPAnnotation():
             gwas_phen = ':'.join(gwas_phen)
 
         # ------------------------------------
-        # HGMD
-        
+        # HGMD        
         hgmd_ant = ['HGMDDB', False]
         hgmd = ['HGMD_DESC', [], []] #Header, string_to_printout, hgmd_acc
         NotAvail = '.'
@@ -543,7 +545,29 @@ class SNPAnnotation():
             hgmd_ant[1] = True
             hgmd_pos_match = True
             hgmd[1] = ','.join(hgmd[1])
+
+        clinvt_pathogenic = False
+        clinvt = ['CLINVT',None]
         
+        if self.clinvtdb.has_snp(chrom, pos, ref):
+            for rec in self.clinvtdb.snp_by_location(chrom, pos):
+                clinvt[1] = self._clinvt_has_alt(ref,alt,rec)
+                if clinvt[1] and 'pathogenic' in clinvt[1]:
+                    clinvt_pathogenic = True
+                    break
+
+        if not clinvt_pathogenic:
+            varlist = normalize_variant(chrom, pos, ref, alt)
+            
+            for var in varlist:
+                if clinvt_pathogenic: break
+                if self.clinvtdb.has_snp(chrom, var[1], var[2]):
+                    for rec in self.clinvtdb.snp_by_location(chrom, var[1]):
+                        clinvt[1] = self._clinvt_has_alt(ref,alt,rec)
+                        if clinvt[1] and 'pathogenic' in clinvt[1]:
+                            clinvt_pathogenic = True
+                            break
+
         # CADD raw and phred score
         cadd_raw, cadd_phred, cadd_aa = (None, None, None)
         if self.ref != '-' and self.alt != '-':
@@ -657,8 +681,8 @@ class SNPAnnotation():
                            [None] * 9 + [omim_phen, omim_ids, site_gad,
                            gerp_consv, lcr_ant, regulome_score, gwas_phen,
                            [dbsnpids, dbsnp_ant, dbsnp_build,
-                           kgdb_ant, kgaf, esp_ant, espaf, exac_ant, exacaf, hgmd_ant, hgmd, clnacc,
-                           clndbn, clndsdb, clndsdbid, clnhgvs,
+                           kgdb_ant, kgaf, esp_ant, espaf, exac_ant, exacaf, hgmd_ant, hgmd, clinvt,
+                           clnacc, clndbn, clndsdb, clndsdbid, clnhgvs,
                            clnorigin, clnsig, clnsrc, clnsrcid],
                            nimb_capture, par, cadd_raw, cadd_phred, cadd_aa, domains]
                     if gene not in intron_entry:
@@ -676,7 +700,7 @@ class SNPAnnotation():
                     splice_site] + [None] * 8 + ['CDS_NOT_MULTIPLE_OF_3'] + \
                     [omim_phen, omim_ids, site_gad, gerp_consv,
                     lcr_ant, regulome_score, gwas_phen, [dbsnpids, dbsnp_ant,
-                    dbsnp_build, kgdb_ant, kgaf, esp_ant, espaf, exac_ant, exacaf, hgmd_ant, hgmd,
+                    dbsnp_build, kgdb_ant, kgaf, esp_ant, espaf, exac_ant, exacaf, hgmd_ant, hgmd, clinvt,
                     clnacc, clndbn, clndsdb, clndsdbid,
                     clnhgvs, clnorigin, clnsig, clnsrc,
                     clnsrcid], nimb_capture, par, cadd_raw, cadd_phred, cadd_aa,
@@ -791,8 +815,8 @@ class SNPAnnotation():
                             omim_ids, site_gad, gerp_consv, lcr_ant,
                             regulome_score, gwas_phen,
                             [dbsnpids, dbsnp_ant, dbsnp_build, kgdb_ant,
-                             kgaf, esp_ant,
-                             espaf, exac_ant, exacaf, hgmd_ant, hgmd, clnacc, clndbn, clndsdb,
+                             kgaf, esp_ant, espaf, exac_ant, exacaf, 
+                             hgmd_ant, hgmd, clinvt, clnacc, clndbn, clndsdb,
                              clndsdbid, clnhgvs, clnorigin, clnsig, clnsrc,
                              clnsrcid], nimb_capture, par, cadd_raw,
                             cadd_phred, cadd_aa, domains]
@@ -807,7 +831,8 @@ class SNPAnnotation():
                                 + [gerp_consv, lcr_ant, regulome_score,
                                    gwas_phen, [dbsnpids, dbsnp_ant,
                                    dbsnp_build, kgdb_ant, kgaf, esp_ant,
-                                   espaf, exac_ant, exacaf, hgmd_ant, hgmd, clnacc, clndbn, clndsdb, clndsdbid,
+                                   espaf, exac_ant, exacaf, hgmd_ant, hgmd, clinvt,
+                                   clnacc, clndbn, clndsdb, clndsdbid,
                                    clnhgvs, clnorigin, clnsig, clnsrc,
                                    clnsrcid], nimb_capture, par, cadd_raw, cadd_phred, cadd_aa,
                                    None]
@@ -843,7 +868,7 @@ class SNPAnnotation():
       input4: hgmd (hgmd_desc ['HGMD_DESC', hgmd annotation, matching type]
       
       output1: flag (whether both ref and alt are matched exactly?)
-      output2: hgmd_desc (
+      output2: hgmd_desc ()
       """
       flag = False
       hgmd_desc = None
@@ -853,6 +878,27 @@ class SNPAnnotation():
         hgmd_desc = self._concat_hgmd_desc(rec)
         flag = True
       return flag,hgmd_desc
+    
+    def _concat_clinvt_desc(self,rec):
+       vc_in_db = rec.VC.lower()
+       cvt_vc = 'vus'
+       if 'conflicting' in vc_in_db:
+          cvt_vc = 'vus'
+       elif 'benign' in vc_in_db:
+          cvt_vc = 'benign'
+       elif 'pathogenic' in vc_in_db:
+          cvt_vc = 'pathogenic'
+       return "%s(%s|%s)"%(cvt_vc,rec.cDNA,rec.URL)
+        
+    def _clinvt_has_alt(self,ref,alt,rec):
+
+      clinvt_desc = None
+      alts = rec.alt.split(',')
+      if rec.ref == ref and alt in alts:
+        clinvt_desc = self._concat_clinvt_desc(rec)
+        
+      return clinvt_desc
+        
 
     def get_header(self):
         """ Intializing vcf formatted header information for populating VARANT
@@ -967,8 +1013,10 @@ def add_meta(vcf, snpa):
 
     #add meta information regardless of the license
     vcf.add_meta_info('HGMDDB', 0, 'Flag', "Variant is present in HGMD database")
-    vcf.add_meta_info('HGMD_DESC', '.', 'String', "[0:NO_HGMD,1:GENE_MATCH,2:POS_MATCH,3:POS_ALT_MATCH](ACC_ID_or_GeneSymbol|Variant_Class|PubMed|Phenotype)")    
-      
+    vcf.add_meta_info('HGMD_DESC', '.', 'String',"[0:NO_HGMD,1:GENE_MATCH,2:POS_MATCH,3:POS_ALT_MATCH](ACC_ID_or_GeneSymbol|Variant_Class|PubMed|Phenotype)")
+    
+    vcf.add_meta_info('CLINVT','.','String',"class(cDNA|source_url)")
+
     clnvir = ClinvarDB()
     for field in ['CLNACC', 'CLNDBN', 'CLNDSDB',
                   'CLNDSDBID', 'CLNHGVS', 'CLNORIGIN',
@@ -984,12 +1032,12 @@ def add_annotation(vcf, rec, annotations):
             vcf.add_info(rec, annotations[i], annotations[i + 1])
 
 
-def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logfile):
+def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logger):
     vcf = VCFParser(vcffile)
     outstream = open(outfile, 'w')
 
     snpa = SNPAnnotation(capture_kit_name, probe_flanking_bp, hgmd_on)
-    logfile.info('Instantiated SNP annotation class..')
+    logger.info('Instantiated SNP annotation class..')
 
     add_meta(vcf, snpa)
     vcf.writeheader(outstream)
@@ -1126,6 +1174,9 @@ def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logfile
             annotations += ['HGMDDB', True]
             annotations += ['HGMD_DESC', snpdb_ant['HGMD_DESC']]
         
+        if snpdb_ant['CLINVT'][0]:
+            annotations += ['CLINVT',snpdb_ant['CLINVT']]
+            
         if len([e for e in snpdb_ant['CLNACC'] if e == '.']) != \
                                             len(snpdb_ant['CLNACC']):
             cols = ['CLN' + ele for ele in ['ACC', 'DBN', 'DSDB', 'DSDBID',
@@ -1152,7 +1203,7 @@ def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logfile
             d = 'Annotated - ' + str(snpcnt) + ' variants in ' + \
                   '%.2f' % ((timecnt) / 60) + 'min,' + \
                   ' Currently processing chrom-%s' % chrom.strip('chr')
-            logfile.info(d)
+            logger.info(d)
             t1 = time.time()
     
     snpa.hgvs.close_resource()
@@ -1163,7 +1214,7 @@ def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logfile
         d = 'Annotated - ' + str(snpcnt) + ' variants in ' + \
                   '%.2f' % ((timecnt) / 60) + 'min,' + \
                   ' Currently processing chrom-%s' % chrom.strip('chr')
-        logfile.info(d)
+        logger.info(d)
     if outstream != sys.stdout:
         outstream.close()
 

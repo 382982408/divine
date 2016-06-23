@@ -72,7 +72,8 @@ FILECONFIG = {
     'KGDB': os.path.join(_LOCALDIR, 'snps',
                          '1000genomes',
          'ALL.wgs.integrated_phase1_v3.20101123.snps_indels_sv.sites.vcf'),
-    'LCR': os.path.join(_LOCALDIR, 'lcr', 'LCR-hs37d5.bed')
+    'LCR': os.path.join(_LOCALDIR, 'lcr', 'LCR-hs37d5.bed'),
+    'CLINVITAE': os.path.join(_LOCALDIR, 'snps','clinvitae','clinvitae.vcf')
     }
 
 
