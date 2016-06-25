@@ -310,6 +310,7 @@ $ your_divine_command 2>&1 | tee divine_err.log
 
 # License
 GNU GENERAL PUBLIC LICENSE
+https://www.gnu.org/licenses/gpl-3.0.en.html
 
 # Disclaimer
 Not intended for direct clinical application. Divine suggests an order of genes to be inspected so that it can make molecular diagnosis effective. The validation is the responsibility of the user. Neither Divine developer nor any software module integrated is responsible for clinical actions that may result from the use of this software. By using this tool, the user assumes all responsibility for any information that may be generated.

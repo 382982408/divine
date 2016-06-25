@@ -842,7 +842,7 @@ class Divine:
 		msg='Total %d perturbed genes are added by phenotype gene enrichment!\ndone. [%s]'%(P_delta,job_name)
 		lib_utils.msgout('notice',msg); self.logger.info(msg)
 		msg='genes enriched by GO:[%s]'%lib_utils.joined(pheno_delta,',')
-		lib_utils.msgout('notice',msg); self.loger.info(msg)
+		lib_utils.msgout('notice',msg); self.logger.info(msg)
 
 	def combine_damage_scores(self):
 
