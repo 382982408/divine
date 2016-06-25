@@ -301,7 +301,7 @@ $ your_divine_command 2>&1 | tee divine_err.log
 
 - Q.14: Can Divine detect a gene previously never known to be associated with a certain disease?
 
-- A.14: This is challenging task but it is essential. Currently, Divine uses gene ontology enrichment and also it applies a system biology approach to detect de novo disease-causing gene.
+- A.14: This is challenging task but it is essential. Currently, Divine uses gene ontology enrichment and also it uses a system biology approach (heat diffusion model) over STRING protein functional network.
 
 
 # Change Log
