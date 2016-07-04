@@ -98,9 +98,10 @@ class Setup():
 		#to access a file containing url file
 		print "downloading Divine resource files ..."
 		dn_dir = os.path.join(self.install_dir,'resource','v%s'%VERSION)
-		if not os.path.exists(dn_dir):
-			os.makedirs(dn_dir)
-
+		if os.path.exists(dn_dir):
+			shutil.rmtree(dn_dir)
+			
+		os.makedirs(dn_dir)
 		fp = open(self.url_fn)
 		for i in fp:
 			if i.startswith('#'):continue
