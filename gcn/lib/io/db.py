@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Class for accessing sqlite databases
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Class for creating and accessing sqlite databases
 """

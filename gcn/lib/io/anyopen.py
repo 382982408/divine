@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Transparent opening of compressed and uncompressed files
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Helper to open files of various types.  This module defines a function
 *openfile* which is passed the name of the file and returns a file object

@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Iterate over each entry in a file containing multiple entries
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 
 This class can be used for those multi-entry files where each entry

@@ -36,11 +36,12 @@ from gcn.lib.databases.snpdb import EspDB
 from gcn.lib.databases.snpdb import ExACDB
 from annotateNimblegenCap import NimblegenCapture
 from gcn.data.pseudoautosomal_genes import PSEUDO_AUTO_GENES
+from gcn.etc.dbconfig import DBCONFIG
 from gcn.lib.io.vcf import VCFParser
 from gcn.lib.io.vcfutils import normalize_variant
 from gcn.bin.hgConvert.hgvs_resource import Hgvs2
 from collections import namedtuple
-import sys
+import os,sys
 import time
 
 CHROMOSOMES, ICHROMOSOMES = get_ucsc_chrom()

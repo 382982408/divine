@@ -37,9 +37,7 @@ class Divine:
 
 		self.exp_tag = uargs.exp_tag
 		self.vknown = uargs.vknown
-		
-		if uargs.no_cadd: self.cadd = False
-		else: self.cadd = True
+		self.cadd = uargs.cadd
 		
 		self.excl_non_coding = False
 		self.sparser = SafeConfigParser()
@@ -53,6 +51,7 @@ class Divine:
 		self.hpo_query = None
 		self.vcf = None
 		self.xls = None
+		self.hgmd = uargs.hgmd
 		
 		lib_utils.msgout('notice','initializing Divine ...','Divine')
 		
@@ -70,13 +69,13 @@ class Divine:
 		self._set_args(uargs)
 		
 		# damage factor w.r.t the location of variant within the transcript
-		self.dm = damaging_model.DmgCoeff(uargs.indel_mode,uargs.top_seed_rate,self.logger)
+		self.dm = damaging_model.DmgCoeff(uargs.indel_mode,uargs.seed_rate,self.logger)
 		
-		if uargs.wes_mask:
+		if uargs.ref_exon_only==1:
 			msg = 'VCF will be masked by RefGene coding region'
 			lib_utils.msgout('notice',msg);self.logger.info(msg)
 
-		self.wes_mask = uargs.wes_mask
+		self.ref_exon_only = uargs.ref_exon_only
 
 		lib_utils.msgout('notice','done. initialization')
 	
@@ -152,7 +151,7 @@ class Divine:
 		self.logger.info(msg)
 		
 		#read configuration file containing 3rd parties s/w path and database locations
-		self._read_config()
+		self._read_config(uargs.vcf_filter_cfg)
 
 		#record user command line
 		self.record_commandline()
@@ -178,7 +177,7 @@ class Divine:
 		except:
 			raise IOError('check if [%s] exists in %s[%s]' % (entry, self.config_fn, section))
 
-	def _read_config(self):
+	def _read_config(self,vcf_filter_cfg=None):
 		'''
 		objective: read configuration file
 		'''
@@ -193,8 +192,14 @@ class Divine:
 		self._set_config('program_paths', 'hposim')
 		self._set_config('program_paths', 'vcf2xls')
 		
-		self._set_config('config', 'vcf_filter_conf')
-		
+		if not vcf_filter_cfg:
+			self._set_config('config', 'vcf_filter_conf')
+		else:
+			if os.path.exists(vcf_filter_cfg):
+				self.entries['vcf_filter_conf'] = vcf_filter_cfg
+			else:
+				raise RuntimeError('check if the file [%s] is valid'%vcf_filter_cfg)
+
 		self._set_config('database', 'ext_disease_to_gene')
 		
 		self._set_config('database', 'hpo_obo')
@@ -274,7 +279,6 @@ class Divine:
 					"-q", self.hpo_query, \
 					"-b", self.entries['hpo_obo'], \
 					"-f", self.entries['ext_disease_to_gene'], \
-					"-S", self.dm.hpo_max_queries, \
 					"--normalize", \
 					"-o", self.hpo2disease_fn]
 
@@ -402,7 +406,7 @@ class Divine:
 		
 		# if necessary, masking the raw vcf file
 		coding_vcf = None
-		if self.wes_mask:
+		if self.ref_exon_only>0:
 			if not lib_utils.check_if_file_valid(varant_vcf) or not reuse:
 				cRef = annotateRegion.RefGeneUcscTB(work_dir=self.out_dir,logger=self.logger)
 				coding_bed_fn = cRef.create_bed(ext_bp=20,reuse=False)
@@ -425,6 +429,9 @@ class Divine:
 						"-l", self.log_dir]
 			if self.capkit:
 				cmd.extend(["-c", self.capkit, "-e", "180"])
+
+			if self.hgmd>0:
+				cmd.extend(["--hgmd"])
 
 			self.run_cmd(cmd,job_name)
 		self.vcf = varant_vcf
@@ -499,7 +506,7 @@ class Divine:
 			
 			# which score can be chosen
 			px = 0.5
-			if self.cadd and px_cadd is not None:
+			if self.cadd>0 and px_cadd is not None:
 				px = px_cadd
 			elif px_gerp is not None:
 				px = px_gerp
@@ -739,7 +746,7 @@ class Divine:
 		stdefp = open(stderr_fn, 'w')
 		return stdofp, stdefp
 	
-	def get_GO_seeds(self,top_seed_rate):
+	def get_GO_seeds(self,seed_rate):
 		'''
 		to collect genes associated a disease whose matching score to HPO is relatively high
 		'''
@@ -759,7 +766,7 @@ class Divine:
 		fp.close()
 		
 		t = 0
-		T = round(num_omim*top_seed_rate)
+		T = round(num_omim*seed_rate)
 		fp = anyopen.openfile(self.hpo2disease_fn)
 		go_seeds = []
 		for i in fp:
@@ -805,7 +812,7 @@ class Divine:
 		lib_utils.msgout('notice',msg,job_name); self.logger.info(msg)
 
 		# to collect genes highly matched to do GO enrichment
-		pgenes2 = self.get_GO_seeds(self.dm.top_seed_rate) #update self.go_seeds
+		pgenes2 = self.get_GO_seeds(self.dm.seed_rate) #update self.go_seeds
 
 		#query high-scored phenotype genes against private genetic-perturbed genes and bring high-matched ones
 		msg='quering total [%d] seed phenotype genes into SQL ...' % len(pgenes2)
@@ -853,7 +860,7 @@ class Divine:
 			(self.hpo_query, self.vcf, job_name)
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 		
-		if self.dm.top_seed_rate>0.:
+		if self.dm.seed_rate>0.:
 			#to select perturbed genes whose GO is highly similar to phenotype genes 
 			self.gene_ontology_enrichment()
 
@@ -980,22 +987,25 @@ class Divine:
 
 def main():
 	parser = argparse.ArgumentParser(description="Divine (v%s) [author:%s]"%(VERSION,author_email))
-	parser.add_argument('-q', dest='hpo_query_fn', required=False, default=None, help='Input patient HPO file. A file contains HPO IDs (e.g., HP:0002307), one entry per line. Refer to http://compbio.charite.de/phenomizer or https://mseqdr.org/search_phenotype.php')
-	parser.add_argument('-v', dest='vcf', required=False, default=None, help='input vcf file')
-	parser.add_argument('-o', action='store', dest='out_dir', required=False, default=None, help='output directory without white space. If not exist, it will create the directory for you.')
-	parser.add_argument('-d', action='store', dest='exp_tag', required=False, default=None, help='specify experiment tag without white space. The tag will be contained in the output file name.')
-	parser.add_argument('-I', action='store', dest='indel_mode', required=False, type=int, default=1, help='the level of fidelity of indell call in VCF [1]:low (e.g., samtools), 2:high (GATK haplotype caller)')
+	parser.add_argument('-q','--hpo', dest='hpo_query_fn', required=False, default=None, help='Input patient HPO file. A file contains HPO IDs (e.g., HP:0002307), one entry per line. Refer to http://compbio.charite.de/phenomizer or https://mseqdr.org/search_phenotype.php')
+	parser.add_argument('-v','--vcf', dest='vcf', required=False, default=None, help='input vcf file')
+	parser.add_argument('-o','--out_dir', action='store', dest='out_dir', required=False, default=None, help='output directory without white space. If not exist, the directory will be created.')
 	
-	parser.add_argument('-r', action='store', dest='top_seed_rate', required=False, type=float, default=0.0015, help='the rate of choosing matched diseases from top for gene enrichment [0.0015]; set to 0. to disable')
+	parser.add_argument('-c','--vcf_filter_cfg', dest='vcf_filter_cfg', required=False, default=None, help='vcf filter configuration file [None]')
 	
-	parser.add_argument('--wes_mask', action='store_const', dest='wes_mask', required=False, default=False, const=True, help='to make the annotation process faster; the annotation process only runs on RefSeq coding regions [False]')
-	parser.add_argument('--no_cadd', action='store_const', dest='no_cadd', required=False, default=False, const=True, help='disable CADD [False]')
-	parser.add_argument('--hgmd', action='store_const', dest='hgmd', required=False, default=False, const=True, help='enable HGMD (requires a license) [False]')
-	parser.add_argument('-k', action='store', dest='vknown', required=False, default=1, type=int, help='apply variant-level pathogenic annotation (e.g., either ClinVar or HGMD) to prioritization strategy [1:Yes], 0:No')
+	parser.add_argument('-d','--exp_tag', action='store', dest='exp_tag', required=False, default=None, help='specify experiment tag without white space. The tag will be contained in the output file name.[None] ')
+	parser.add_argument('-i','--indel', action='store', dest='indel_mode', required=False, type=int, default=1, help='the level of fidelity of indell call in VCF, [1]:low (e.g., samtools), 2:high (GATK haplotype caller)')
+	
+	parser.add_argument('-r','--seed_rate', action='store', dest='seed_rate', required=False, type=float, default=0.0015, help='the rate of choosing matched diseases from top for gene enrichment [0.0015]; set to 0. to disable')
+	
+	parser.add_argument('-e','--ref_exon_only', action='store', dest='ref_exon_only', required=False, default=1, help='the annotation process only runs on RefSeq coding regions 0:No, [1]:Yes')
+	parser.add_argument('-C','--cadd', action='store', dest='cadd', required=False, default=1, help='use CADD prediction score, 0:No, [1]:Yes')
+	parser.add_argument('-H','--hgmd', action='store', dest='hgmd', required=False, default=0, help='enable HGMD (requires a license), [0]:No, 1:Yes')
+	parser.add_argument('-k','--vknown', action='store', dest='vknown', required=False, default=1, type=int, help='apply variant-level pathogenic annotation (e.g., either ClinVar or HGMD) to prioritization strategy, 0:No, [1]:Yes')
 
+	parser.add_argument('-t', dest='capkit', required=False, default='SureSelect_V6', help='capture kit symbol [SureSelect_V6]')
 	parser.add_argument('--reuse', action='store_const', dest='reuse', required=False, default=False, const=True, help='Reuse previous annotation file (divine.vcf) if it is available [False]')
-	parser.add_argument('-c', dest='capkit', required=False, default='SureSelect_V6', help='capture kit symbol [SureSelect_V6]')
-		
+	
 	args = parser.parse_args()
 	
 	lib_utils.msgout('banner','Divine (v%s) | contact to %s for any question/error report/feedback'%(VERSION,author_email))

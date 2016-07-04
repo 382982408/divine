@@ -3,7 +3,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Read BED files
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Parser for BED (Browser Extensible Data)files. A detailed description of
 the format can be found at the UCSC_ site.

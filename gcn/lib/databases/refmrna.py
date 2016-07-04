@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Class for accessing  information from an sqlite database
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Class for accessing refmrna information from an sqlite database
 """

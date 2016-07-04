@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Phase the genotype of a child given parents genotypes
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 This module exports 4 funtions:
 

@@ -6,7 +6,7 @@ author: changjin.hong@gmail.com
 
 class DmgCoeff:
 	
-	def __init__(self,indel_mode=1,top_seed_rate=0.0015,logger=None):
+	def __init__(self,indel_mode=1,seed_rate=0.0015,logger=None):
 		msg='setting up damaging factors ...'
 		print msg
 		if logger: logger.info(msg)
@@ -48,10 +48,9 @@ class DmgCoeff:
 		self.avg_protein_len = 480
 		
 		self.prior = 1.25
-		self.top_seed_rate = top_seed_rate
+		self.seed_rate = seed_rate
 		self.go_penalty = 0.4
 		self.gosim_min = 0.95
 		self.ptwt = 0.5
 		self.gtwt = 0.5
 		self.prwt = 0.3
-		self.hpo_max_queries = 15

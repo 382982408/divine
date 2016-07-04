@@ -26,18 +26,19 @@ https://github.com/cjhong/divine
 # Setup
 
 ## Prerequisite:
-- Linux, python 2.7+
+- Linux, 4 GB RAM, and 130 GB available hard disk space
+- python 2.7+
 - make sure that 'pip', 'wget' (with Internet connection), 'grep', 'awk', and 'sort' command in $PATH
-
+ 
 ## Python modules to be installed
-Divine requires the following modules and, during the setup process, the modules are installed automatically if necessary.
+Divine requires the following modules but, during the setup process, the modules will be installed automatically if necessary.
 
 - *fastsemsim-0.9.4: https://sites.google.com/site/fastsemsim
 - *hgvs: https://github.com/counsyl/hgvs
 - *hpo_similarity: https://github.com/jeremymcrae/hpo_similarity
 - ConfigParser, backports-abc, backports.ssl-match-hostname, certifi, decorator, matplotlib, networkx, nose, numpy, pandas, pygr, pyparsing, pysam, python-dateutil, pytz, scikit-learn, singledispatch, six, tornado, xlwt
 
-- [*] is already included in the Divine package.
+- [*]: the python modules are already included in the Divine package.
 
 ## Install
 
@@ -125,7 +126,7 @@ Any VCF file following the standard format (e.g., https://samtools.github.io/hts
 `hpo_to_diseases.tsv`: From an input HPO file, Divine prioritize which disease the patient likely has. The output format is
 ```
 $ cat hpo_to_disease.tsv
-#disease_ID	genes	score[BMA]
+#disease_ID	genes	score[FunSimMax]
 OMIM:101600	FGFR1,FGFR2	0.000911782
 OMIM:101200	FGFR2	0.000674322
 :
@@ -200,51 +201,75 @@ cd $DIVINE/gcn/bin/prioritize/examples
 # Help
 ```
 usage: divine.py [-h] [-q HPO_QUERY_FN] [-v VCF] [-o OUT_DIR] [-d EXP_TAG]
-                 [-I INDEL_MODE] [-r TOP_SEED_RATE] [--wes_mask] [--no_cadd]
-                 [--hgmd] [-k VKNOWN] [--reuse] [-c CAPKIT]
+                 [-i INDEL_MODE] [-r SEED_RATE] [-e REF_EXON_ONLY] [-c CADD]
+                 [-H HGMD] [-k VKNOWN] [-t CAPKIT] [--reuse]
 
 Divine (v0.1.1) [author:changjin.hong@gmail.com]
 
 optional arguments:
-  -h, --help        show this help message and exit
-  -q HPO_QUERY_FN   Input patient hpo file. A file contains HPO IDs (e.g.,
-                    HP:0002307), one entry per line. Refer to
-                    http://compbio.charite.de/phenomizer or
-                    https://mseqdr.org/search_phenotype.php
-  -v VCF            input vcf file
-  -o OUT_DIR        output directory without white space. If not exist, it
-                    will create the directory for you.
-  -d EXP_TAG        specify experiment tag without white space. The tag will
-                    be contained in the output file name.
-  -I INDEL_MODE     the level of fidelity of indell call in VCF [1]:low (e.g.,
-                    samtools), 2:high (GATK haplotype caller)
-  -r TOP_SEED_RATE  the rate of choosing matched diseases from top for gene
-                    enrichment [0.0015]; set to 0. to disable
-  --wes_mask        to make the annotation process faster; the annotation
-                    process only runs on RefSeq coding regions [False]
-  --no_cadd         disable CADD [False]
-  --hgmd            enable HGMD (requires a license) [False]
-  -k VKNOWN         apply variant-level pathogenic annotation (e.g., either
-                    ClinVar or HGMD) to prioritization strategy [1:Yes], 0:No
-  --reuse           Reuse previous annotation file (divine.vcf) if it is
-                    available [False]
-  -c CAPKIT         capture kit symbol[SureSelect_V6]
+  -h, --help            show this help message and exit
+  -q HPO_QUERY_FN, --hpo HPO_QUERY_FN
+                        Input patient HPO file. A file contains HPO IDs (e.g.,
+                        HP:0002307), one entry per line. Refer to
+                        http://compbio.charite.de/phenomizer or
+                        https://mseqdr.org/search_phenotype.php
+  -v VCF, --vcf VCF     input vcf file
+  -o OUT_DIR, --out_dir OUT_DIR
+                        output directory without white space. If not exist,
+                        the directory will be created.
+  -d EXP_TAG, --exp_tag EXP_TAG
+                        specify experiment tag without white space. The tag
+                        will be contained in the output file name.[None]
+  -i INDEL_MODE, --indel INDEL_MODE
+                        the level of fidelity of indell call in VCF, [1]:low
+                        (e.g., samtools), 2:high (GATK haplotype caller)
+  -r SEED_RATE, --seed_rate SEED_RATE
+                        the rate of choosing matched diseases from top for
+                        gene enrichment [0.0015]; set to 0. to disable
+  -e REF_EXON_ONLY, --ref_exon_only REF_EXON_ONLY
+                        the annotation process only runs on RefSeq coding
+                        regions 0:No, [1]:Yes
+  -c CADD, --cadd CADD  use CADD prediction score, 0:No, [1]:Yes
+  -H HGMD, --hgmd HGMD  enable HGMD (requires a license), [0]:No, 1:Yes
+  -k VKNOWN, --vknown VKNOWN
+                        apply variant-level pathogenic annotation (e.g.,
+                        either ClinVar or HGMD) to prioritization strategy,
+                        0:No, [1]:Yes
+  -t CAPKIT             capture kit symbol [SureSelect_V6]
+  --reuse               Reuse previous annotation file (divine.vcf) if it is
+                        available [False]
 ```
 
 # FAQ
 
-- Q.1: I have a VCF file generated from either WGS or WES dataset and the number of variants is a lot! It sems that Divine is slow and I want to have a result as soon as possible.
+- Q.1: I have a VCF file generated from either WGS or WES dataset and the number of variants is a lot! It seems that Divine is slow and I want to have a result as soon as possible.
 
-- A.1: Depending on your hardware specification and the number of variants in an input VCF file, the computational time varies. In my computer setting (e.g., Intel Core 2 Duo @ 2.93GHz), it takes 30 min to handle 37,000 variants. The computational bottleneck is directly associated with hard disk drive I/O. HDD connected to USB 3.0 or SDD (solid-state drive) can be helpful. Also, we are actively working on Divine to speed up the process. For now, you can make the process faster by focusing only NCBI RefGene with +/-20bp flanking from each exon boundary. However, be aware that it may not detect a pathogenic variant in intergenic region or up/downstream.
+- A.1: Depending on your hardware specification and the number of variants in an input VCF file, the computational time varies. In my computer setting (e.g., Intel Core 2 Duo @ 2.93GHz), it takes 30 min to handle 37,000 variants. The computational bottleneck is directly associated with hard disk drive I/O. HDD connected to USB 3.0 or SDD (solid-state drive) can be helpful. Also, we are actively working on Divine to speed up the process. For now, Divine is optimized to analyze WES or targeted panel samples but not WGS. As a default option, Divine focuses on NCBI RefGene exon regions with +/-20bp flanking. However, be aware that it may not detect a pathogenic variant in intergenic region or up/downstream. For a VCF file containing a small number of variants, we suggest `-e 0` instead. 
 
-```
-$ divine.py -q dir_to_the_hpo/P0004.hpo -v dir_to_the_vcf/P0004.vcf \
-   --wes_mask -o dir_to_the_output/P0004
-```
+- Q.2: I don't like a default filtering scheme used in Divine. I want my own filtering strategy (e.g., include a certain flag in FILTER; not to use ExAC; 0.03 for MAF cutoff).
 
-- Q.2: I don't like a default filtering scheme used in Divine. I want my own filtering strategy (e.g., including both PASS and LOW in FILTER; not to use ExAC; 0.03 for MAF cutoff).
-
-- A.2: open $DIVINE/gcn/config/filterconf.txt and edit the configuration file. Later we will provide more comprehensive instruction for this file
+- A.2: open $DIVINE/gcn/config/filterconf.txt and edit the configuration file. For example, set `excl=LowQual` to filter out all LowQual in the VCF file. Later, we will provide more comprehensive instruction for this file. The default configuration is
+``
+[fltr]
+excl=LowQual
+[infoflag]
+excl=DB137
+[infoval]
+kgaf=yes
+espaf=yes
+exacaf=yes
+splice_dist=20
+hgmd_filter=2
+regulome=no
+[reg]
+incl=CodingExonic:NonCodingExonic:CodingIntronic:NonCodingIntronic
+[freq]
+incl=0.01
+[freq_cli]
+incl=0.05
+[gid]
+min=0.1
+``
 
 - Q.3: I purchase HGMD professional license and how can I use this feature?
 
@@ -302,7 +327,6 @@ $ your_divine_command 2>&1 | tee divine_err.log
 - Q.14: Can Divine detect a gene previously never known to be associated with a certain disease?
 
 - A.14: This is challenging task but it is essential. Currently, Divine uses gene ontology enrichment and also it uses a system biology approach (heat diffusion model) over STRING protein functional network.
-
 
 # Change Log
 - v.0.1.1 (June 15 2016)

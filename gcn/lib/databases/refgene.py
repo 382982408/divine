@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Class for accessing refgene information from an sqlite database
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Class for accessing refgene information from an sqlite database. A refgene
 is an instance of the `Gene` namedtuple

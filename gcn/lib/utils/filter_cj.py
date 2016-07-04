@@ -220,7 +220,7 @@ class Filter:
               vc = mObj.group(2).split('|')[1]
               if vc in hgmd_pos:
                 vc_found = vc
-                return vc_found
+                break
               elif vc in hgmd_likely_pos:
                 if vc_found<LIKELY_DM:
                   vc_found = LIKELY_DM
@@ -233,10 +233,7 @@ class Filter:
           else:
             print 'check HGMD_DESC[%s]'%var
       
-      if vc_found>PREDICTED:
-        return vc_found
-      else:
-        return vc_found
+      return vc_found
 
     def in_pathogene(self, rec):
       
@@ -518,7 +515,7 @@ class Filter:
         if hgmd_vc == -1:
           return retain, None, '1c'
 
-        if clinvar_dm == 1 or hgmd_vc == 1:
+        if clinvar_dm == 1 or hgmd_vc > 2:
           maf_tag = self.gmaf_stringent(rec, self.cli_freqincl[0])
           if maf_tag == 'frequent':
             return retain, None, '2c'
@@ -674,6 +671,10 @@ if __name__ == "__main__":
       v.parseinfo(rec)
       if not options.skip_parse_genotype:
         v.parsegenotypes(rec)
+
+      if min_depth>0:
+        if int(rec[v.samples[0]].DP) < min_depth:
+          continue
 
       retain, dTxes, rec.info.CLASS_TAG = f.retain(rec)
       if retain:

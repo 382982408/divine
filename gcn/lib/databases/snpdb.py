@@ -7,7 +7,7 @@
     :synopsis: Class for accessing SNP information from an sqlite
                database
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 Class for accessing variant information from an sqlite database.  This is
 primarily intended for reference databases of variants such as dbSNP,

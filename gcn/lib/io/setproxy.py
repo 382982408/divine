@@ -6,7 +6,7 @@
     :platform: Unix, Windows, MacOSX
     :synopsis: Functions to setup access through an authenticated web proxy
 
-.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com)
+.. moduleauthor:: Rajgopal Srinivasan (rajgopal.srinivasan@gmail.com); modified by changjin.hong@gmail.com
 
 
 Helper module to make it easy to work with proxies.  Assuming you are

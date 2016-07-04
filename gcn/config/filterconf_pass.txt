@@ -1,6 +1,6 @@
 [fltr]
-excl=LowQual
-#incl=PASS
+#excl=LowQual
+incl=PASS
 [infoflag]
 excl=DB137
 [infoval]
