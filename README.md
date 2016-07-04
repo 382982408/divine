@@ -36,7 +36,7 @@ Divine requires the following modules but, during the setup process, the modules
 - *fastsemsim-0.9.4: https://sites.google.com/site/fastsemsim
 - *hgvs: https://github.com/counsyl/hgvs
 - *hpo_similarity: https://github.com/jeremymcrae/hpo_similarity
-- ConfigParser, backports-abc, backports.ssl-match-hostname, certifi, decorator, matplotlib, networkx, nose, numpy, pandas, pygr, pyparsing, pysam, python-dateutil, pytz, scikit-learn, singledispatch, six, tornado, xlwt
+- ConfigParser, backports-abc, backports.ssl-match-hostname, certifi, decorator, matplotlib, networkx, nose, numpy, pandas, pygr, pyparsing, pysam, python-dateutil, pytz, scipy, scikit-learn, singledispatch, six, tornado, xlwt
 
 - [*]: the python modules are already included in the Divine package.
 

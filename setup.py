@@ -63,7 +63,7 @@ class Setup():
 		self.py_modules = ['ConfigParser','backports-abc',\
 			'backports.ssl-match-hostname','certifi','decorator',\
 				'matplotlib','networkx','nose','numpy','pandas','pygr',\
-					'pyparsing','pysam','python-dateutil','pytz',\
+					'pyparsing','pysam','python-dateutil','pytz','scipy',\
 						'scikit-learn','singledispatch','six','tornado','xlwt']
 
 		self.pylib_prefix = 'python_libs'
