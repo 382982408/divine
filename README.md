@@ -252,7 +252,8 @@ optional arguments:
 - Q.2: I don't like a default filtering scheme used in Divine. I want my own filtering strategy (e.g., include a certain flag in FILTER; not to use ExAC; 0.03 for MAF cutoff).
 
 - A.2: open $DIVINE/gcn/config/filterconf.txt and edit the configuration file. For example, set `excl=LowQual` to filter out all LowQual in the VCF file. Later, we will provide more comprehensive instruction for this file. The default configuration is
-``
+
+```
 [fltr]
 excl=LowQual
 [infoflag]
@@ -272,7 +273,7 @@ incl=0.01
 incl=0.05
 [gid]
 min=0.1
-``
+```
 
 - Q.3: I purchase HGMD professional license and how can I use this feature?
 
