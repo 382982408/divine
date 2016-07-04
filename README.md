@@ -200,9 +200,10 @@ cd $DIVINE/gcn/bin/prioritize/examples
 
 # Help
 ```
-usage: divine.py [-h] [-q HPO_QUERY_FN] [-v VCF] [-o OUT_DIR] [-d EXP_TAG]
-                 [-i INDEL_MODE] [-r SEED_RATE] [-e REF_EXON_ONLY] [-c CADD]
-                 [-H HGMD] [-k VKNOWN] [-t CAPKIT] [--reuse]
+usage: divine.py [-h] [-q HPO_QUERY_FN] [-v VCF] [-o OUT_DIR]
+                 [-c VCF_FILTER_CFG] [-d EXP_TAG] [-i INDEL_MODE]
+                 [-r SEED_RATE] [-e REF_EXON_ONLY] [-C CADD] [-H HGMD]
+                 [-k VKNOWN] [-t CAPKIT] [--reuse]
 
 Divine (v0.1.1) [author:changjin.hong@gmail.com]
 
@@ -217,6 +218,8 @@ optional arguments:
   -o OUT_DIR, --out_dir OUT_DIR
                         output directory without white space. If not exist,
                         the directory will be created.
+  -c VCF_FILTER_CFG, --vcf_filter_cfg VCF_FILTER_CFG
+                        vcf filter configuration file [None]
   -d EXP_TAG, --exp_tag EXP_TAG
                         specify experiment tag without white space. The tag
                         will be contained in the output file name.[None]
@@ -229,7 +232,7 @@ optional arguments:
   -e REF_EXON_ONLY, --ref_exon_only REF_EXON_ONLY
                         the annotation process only runs on RefSeq coding
                         regions 0:No, [1]:Yes
-  -c CADD, --cadd CADD  use CADD prediction score, 0:No, [1]:Yes
+  -C CADD, --cadd CADD  use CADD prediction score, 0:No, [1]:Yes
   -H HGMD, --hgmd HGMD  enable HGMD (requires a license), [0]:No, 1:Yes
   -k VKNOWN, --vknown VKNOWN
                         apply variant-level pathogenic annotation (e.g.,
