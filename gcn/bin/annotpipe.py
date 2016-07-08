@@ -13,6 +13,7 @@ import os
 import argparse
 import time
 import datetime
+from gcn.config import lib_config
 from gcn.etc.fileconfig import getlogger, FILECONFIG
 from gcn.lib.varann.vartype.varant import annotator
 
@@ -55,8 +56,8 @@ class AnnotPline:
         flag = 0
         envs = ['GCN', 'GCN_DATA_DIR', 'GCN_DB_DIR']
         for env in envs:
-            if env in os.environ:
-                loc = os.environ[env]
+            loc = lib_config.gcn_path(env)
+            if loc:
                 if not os.path.exists(loc):
                     self.logger.error('Path set to %s environment does not '
                                       'exist..' % env)

@@ -20,14 +20,14 @@ value the full paths to where the files are stored on the local system.
 import os
 import logging
 import logging.handlers
+from gcn.config import lib_config
 
 _LOCALDIR = '/opt/data'
-
 
 def set_localdir():
     """Set the local database directory from the enviornmental variable
     GCN_DATA_DIR"""
-    local = os.environ.get('GCN_DATA_DIR', None)
+    local = lib_config.gcn_path('GCN_DATA_DIR')
     if local is not None:
         global _LOCALDIR
         _LOCALDIR = local
@@ -48,7 +48,7 @@ FILECONFIG = {
                           'human_predictions_S_C_aug2010.txt'),
     'UTRDB': os.path.join(_LOCALDIR, 'utrdb', ''),
     'CLNPHESNP': os.path.join(_LOCALDIR, 'clnphesnp', ''),
-    'LOGFILE': os.environ.get('GCN_LOGFILE', None),
+    'LOGFILE': lib_config.gcn_path('GCN_LOGFILE'),
     'UNIPROT': os.path.join(_LOCALDIR, 'uniprot',
                            'uniprot_sprot_human.dat'),
     'OMIM': os.path.join(_LOCALDIR, 'omim',

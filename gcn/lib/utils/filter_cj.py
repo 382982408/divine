@@ -148,7 +148,7 @@ class Filter:
             else:
                 vals = val.split(':')
                 for v in vals:
-                  excl.append(conv_str2format(val))
+                  excl.append(conv_str2format(v))
                     
         return incl, excl
         
@@ -482,13 +482,18 @@ class Filter:
         
         retain = fltrretain = regretain = freqretain = generetain = vtretain = iflgretain = False
         class_tag = ''
-      
+
         if self.fltrincl:
             for f in rec.filter:
                 if f in self.fltrincl:
                     fltrretain = True
         else:
             fltrretain = True
+
+        if self.fltrexcl:
+            for f in rec.filter:
+                if f in self.fltrexcl:
+                    return False, None, '1'
 
         if self.geneincl:
            if self.in_gene(rec,self.geneincl):

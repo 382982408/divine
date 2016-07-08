@@ -3,6 +3,7 @@
 author: changjin.hong@gmail.com
 '''
 import os, argparse
+from gcn.config import lib_config
 import lib_clinvitae
 
 def main():
@@ -18,7 +19,7 @@ def main():
 		default=None, help='a file generated from https://mutalyzer.nl/position-converter')
 	
 	parser.add_argument('-o', '--out_dir', dest='out_dir', required=False,\
-		type=str, default = os.environ.get('GCN_DATA_DIR', None),\
+		type=str, default = lib_config.gcn_path('GCN_DATA_DIR'),\
 			help='output directory')
 	
 	args = parser.parse_args()

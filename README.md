@@ -29,7 +29,12 @@ https://github.com/cjhong/divine
 - Linux, 4 GB RAM, and 130 GB available hard disk space
 - python 2.7+
 - make sure that 'pip', 'wget' (with Internet connection), 'grep', 'awk', and 'sort' command in $PATH
- 
+- locate your shell configuration file (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc) and add 'PYTHONPATH' into the configuration file if it does not exist. For example,
+
+```
+export PYTHONPATH=$HOME/apps/python_libs:$PYTHONPATH
+```
+
 ## Python modules to be installed
 Divine requires the following modules but, during the setup process, the modules will be installed automatically if necessary.
 
@@ -56,11 +61,12 @@ $ setup.py --install --update_db
 
 ### Optional 2: only reinstall python modules of dependency
 ```
+(optional)$ setup.py --uninstall
 $ setup.py --install
 ```
 
 ## Configuration
-- Get environment variables (DIVINE,GCN,GCN_DATA_DIR,GCN_DB_DIR,GCN_LOGFILE,PATH,PYTHONPATH) at the end of the installation setup message. Then,
+- Get environment variables (DIVINE,PATH,PYTHONPATH) at the end of the installation setup message. Then,
 
 - Add the environment variables into your shell configuration (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc)
 
@@ -334,7 +340,7 @@ $ your_divine_command 2>&1 | tee divine_err.log
 
 # Change Log
 - v.0.1.1 (June 15 2016)
-	- Original release, Clinvitae(http://clinvitae.invitae.com/) added
+	- Original release
 
 # License
 GNU GENERAL PUBLIC LICENSE
@@ -344,8 +350,12 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
 Not intended for direct clinical application. Divine suggests an order of genes to be inspected so that it can make molecular diagnosis effective. The validation is the responsibility of the user. Neither Divine developer nor any software module integrated is responsible for clinical actions that may result from the use of this software. By using this tool, the user assumes all responsibility for any information that may be generated.
 
 # Reference
+- OMIM: Online Mendelian Inheritance in Man, OMIM®. McKusick-Nathans Institute of Genetic Medicine, Johns Hopkins University (Baltimore, MD), {date}. World Wide Web URL: http://omim.org/
+- Sebastian Köhler, Sandra C Doelken, Christopher J. Mungall, Sebastian Bauer, Helen V. Firth, et al. "The Human Phenotype Ontology project: linking molecular biology and disease through phenotype data", Nucl. Acids Res. (1 January 2014) 42 (D1): D966-D974 doi:10.1093/nar/gkt1026
+- HGMD: https://www.qiagenbioinformatics.com/files/user_manuals/HGMD_User_Manual_2015.2.pdf
+- CADD: http://cadd.gs.washington.edu/
 - Varant: http://compbio.berkeley.edu/proj/varant/publication.html
-- Divine: Disease-causing genes/Variant prioritization in clinical whole exome sequencing data, Changjin Hong, David Yang, and Tae-Hyun Hwang (in publication)
+- Divine: Disease-causing genes/variant prioritization in clinical whole exome sequencing data, Changjin Hong *et. al.* (in publication)
 
 # Contact
 - Changjin Hong, Ph.D (changjin.hong@gmail.com)

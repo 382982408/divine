@@ -32,6 +32,7 @@ The parameters `host`, `port`, `user` and `password` may all be ignored for
 sqlite3 and similar databases
 """
 import os
+from gcn.config import lib_config
 
 _LOCALDIR = '/opt/db'
 
@@ -39,7 +40,7 @@ _LOCALDIR = '/opt/db'
 def set_localdir():
     """Set the local database directory from the enviornmental variable
     GCN_DB_DIR"""
-    local = os.environ.get('GCN_DB_DIR', None)
+    local = lib_config.gcn_path('GCN_DB_DIR')
     if local is not None:
         global _LOCALDIR
         _LOCALDIR = local

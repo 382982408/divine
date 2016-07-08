@@ -59,7 +59,8 @@ class Divine:
 		if not divine_root_dir:
 			raise EnvironmentError("set DIVINE variable properly!")
 		
-		config_fn = os.path.join(divine_root_dir,'gcn','bin','prioritize','configs','divine.conf')
+		config_fn = os.path.join(divine_root_dir,'gcn','config','divine.conf')
+
 		
 		if not lib_utils.check_if_file_valid(config_fn):
 			raise IOError("check if the configuration file[%s] is valid!" % config_fn)
@@ -187,11 +188,11 @@ class Divine:
 
 		self.sparser.read(self.config_fn)
 
-		self._set_config('program_paths', 'temp_dir')
 		self._set_config('program_paths', 'varant')
 		self._set_config('program_paths', 'hposim')
 		self._set_config('program_paths', 'vcf2xls')
 		
+		self._set_config('config', 'temp_dir')
 		if not vcf_filter_cfg:
 			self._set_config('config', 'vcf_filter_conf')
 		else:

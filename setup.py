@@ -93,7 +93,7 @@ class Setup():
 		syscmd(cmd)
 	
 	def download_data(self,keep_download_files=True):
-		print "updating prebuilt annotation databases (be patient) ..."
+		print "updating prebuilt annotation databases ..."
 		
 		#to access a file containing url file
 		print "downloading Divine resource files ..."
@@ -117,7 +117,7 @@ class Setup():
 		fp.close()
 		print "Done."
 		
-		print "extracting resource files ..."
+		print "extracting resource files (it will take a couple of hours to complete and be patient) ..."
 		fns = os.listdir(dn_dir)
 		extracted = []
 		for fn in fns:
@@ -146,6 +146,12 @@ class Setup():
 	def install_python_libs(self):
 		#to make sure that PYTHONPATH includes the directory to install python modules
 		if 'PYTHONPATH' in os.environ:
+			for module in self.py_modules:
+				if not has_module(module):
+					print 'installing [%s] ...'%module
+					self.install_module_by_pip(module)
+					print 'done.'
+
 			for module in self.py_libs_prefix:
 				module_path = os.path.join(self.py_libs_dir,module)
 				setup_py = os.path.join(module_path,'setup.py')
@@ -157,12 +163,6 @@ class Setup():
 					print 'done.'
 				else:
 					raise IOError('check if [%s] contains all necessary files;enable the option, --update_db'%module_path)
-				
-			for module in self.py_modules:
-				if not has_module(module):
-					print 'installing [%s] ...'%module
-					self.install_module_by_pip(module)
-					print 'done.'
 		else:
 			raise EnvironmentError("add PYTHONPATH into your shell configuration file.")
 		
@@ -214,11 +214,7 @@ class Setup():
 			shell_cnf_fn= '$HOME/.profile, $HOME/.bash_profile, or $HOME/.bashrc'
 
 		msg = "%s DIVINE%s%s\n"%(set_keyword,set_link,self.install_dir)
-		msg += "%s GCN%s$DIVINE/%s\n"%(set_keyword,set_link,self.gcn)
-		msg += "%s GCN_DATA_DIR%s$DIVINE/%s\n"%(set_keyword,set_link,self.gcndata)
-		msg += "%s GCN_DB_DIR%s$DIVINE/%s\n"%(set_keyword,set_link,self.gcndb)
-		msg += "%s GCN_LOGFILE%s$DIVINE/%s\n"%(set_keyword,set_link,self.gcnlog)
-		
+
 		hline = "-------------------------------"
 
 		if setup_mode == 'install':
@@ -261,9 +257,9 @@ def main():
 	if args.install:
 		if not check_network_on():
 			raise RuntimeError('it requires network connection to setup Divine!')
+		cs.install_python_libs()
 		if args.update_db:
 			cs.download_data()
-		cs.install_python_libs()
 		cs.msg_config('install')
 	elif args.uninstall:
 		cs.uninstall_python_libs()

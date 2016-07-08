@@ -9,12 +9,12 @@ This converts the human genome coordinate from hg18 to hg19 and visa versa.
 """
 
 import os
-
+from gcn.config import lib_config
 
 class hgConvert:
 
     def __init__(self):
-        self.location = os.environ.get('GCN')
+        self.location = lib_config.gcn_path('GCN')
         self.liftover = os.path.join(self.location, \
                                       'gcn/bin/hgConvert/liftOver_exe', \
                                       'liftOver')
