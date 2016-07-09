@@ -1,8 +1,8 @@
 #pkg_name	url
-divine-0.1.1_data.tar.bz2.aa	https://googledrive.com/host/0B99h1qj4K9BSYjdtU0I4MnFyUGM
-divine-0.1.1_data.tar.bz2.ab	https://googledrive.com/host/0B99h1qj4K9BSbEQ4MG4zazJ4bU0
-divine-0.1.1_data.tar.bz2.ac	https://googledrive.com/host/0B9CIp5UVS9fWMjAxd3BMU2c0NUU
-divine-0.1.1_data.tar.bz2.ad	https://googledrive.com/host/0B9CIp5UVS9fWV1VfU042UEpHd1k
-divine-0.1.1_data_delta1.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSSWdkZmx6dlQ2OHM
-devine-0.1.1_example.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSdjNHZG5BMWVxOGc
-divine-0.1.1_pylibs.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSQ0F2b0UzcHNOVWM
+DATA	divine-0.1.1_data.tar.bz2.aa	https://googledrive.com/host/0B99h1qj4K9BSYjdtU0I4MnFyUGM
+DATA	divine-0.1.1_data.tar.bz2.ab	https://googledrive.com/host/0B99h1qj4K9BSbEQ4MG4zazJ4bU0
+DATA	divine-0.1.1_data.tar.bz2.ac	https://googledrive.com/host/0B9CIp5UVS9fWMjAxd3BMU2c0NUU
+DATA	divine-0.1.1_data.tar.bz2.ad	https://googledrive.com/host/0B9CIp5UVS9fWV1VfU042UEpHd1k
+DATA_DELTA	divine-0.1.1_data_delta1.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSSWdkZmx6dlQ2OHM
+EXAMPLE	devine-0.1.1_example.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSdjNHZG5BMWVxOGc
+SOURCE	divine-0.1.1_pylibs.tar.bz2	https://googledrive.com/host/0B99h1qj4K9BSQ0F2b0UzcHNOVWM

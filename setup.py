@@ -79,11 +79,13 @@ class Setup():
 		self.gcndb = 'gcndb'
 		self.gcnlog = 'gcn/logs/gcn.log'
 		
+		self.user_has_pythonpath=os.environ.get('PYTHONPATH',None)
+		
 		if url_fn is None:
 			self.url_fn = os.path.join(self.install_dir,'resource','support_pkg_urls.txt')
 		else:
 			self.url_fn = url_fn
-			
+
 		if not os.path.exists(self.url_fn):
 			raise RuntimeError('a config file[%s] for resource packages does not exist!'%self.url_fn)
 
@@ -92,35 +94,40 @@ class Setup():
 		cmd = "PYTHONUSERBASE=%s pip install --user %s"%(self.pylib,pkg_name)
 		syscmd(cmd)
 	
-	def download_data(self,keep_download_files=True):
-		print "updating prebuilt annotation databases ..."
+	def download_data(self,ucategory=None,keep_download_files=True):
+		
+		print "downloading Divine resource files [%s] ..."%ucategory
+		
+		if not cmd_exists('wget'):
+			raise RuntimeError('wget should be in path!')
 		
 		#to access a file containing url file
-		print "downloading Divine resource files ..."
 		dn_dir = os.path.join(self.install_dir,'resource','v%s'%VERSION)
-		if os.path.exists(dn_dir):
-			shutil.rmtree(dn_dir)
+		dn_fns = []
+		
+		if not os.path.exists(dn_dir):
+			os.makedirs(dn_dir)
 			
-		os.makedirs(dn_dir)
 		fp = open(self.url_fn)
 		for i in fp:
 			if i.startswith('#'):continue
-			res_name,res_url = i.strip().split('\t')
+			category,res_name,res_url = i.strip().split('\t')
 			
+			if ucategory and (ucategory != category):
+				continue
 			dn_fn = os.path.join(dn_dir,res_name)
 
-			if cmd_exists('wget'):
-				cmd = 'wget -O %s -c %s'%(dn_fn,res_url)
-			else:
-				raise RuntimeError('wget should be in path!')
+			cmd = 'wget -O %s -c %s'%(dn_fn,res_url)
+			dn_fns.append(dn_fn)
 			syscmd(cmd) #debug
+
 		fp.close()
 		print "Done."
 		
-		print "extracting resource files (it will take a couple of hours to complete and be patient) ..."
-		fns = os.listdir(dn_dir)
+		print "extracting resource files (it may take a couple of hours to complete and be patient) ..."
+		
 		extracted = []
-		for fn in fns:
+		for fn in dn_fns:
 			if 'tar.bz2' in fn:
 				mObj = re.search(r'(\S+)\.tar\.bz2\.\S+',fn)
 				if mObj:
@@ -133,11 +140,13 @@ class Setup():
 
 				if arch_path not in extracted:
 					extracted.append(arch_path)
+					print "extracting [%s] ..."%arch_path
 					syscmd(cmd)
 		print "Done."
 		
 		if not keep_download_files:
-			os.system("rm -rf %s/*.tar.bz2*"%dn_dir)
+			for fn in extracted:
+				syscmd('rm -rf %s*'%fn)
 	
 	def uninstall_resource(self):
 		shutil.rmtree(os.path.join(self.install_dir,'gcndb'))
@@ -145,58 +154,58 @@ class Setup():
 		
 	def install_python_libs(self):
 		#to make sure that PYTHONPATH includes the directory to install python modules
-		if 'PYTHONPATH' in os.environ:
-			for module in self.py_modules:
-				if not has_module(module):
-					print 'installing [%s] ...'%module
-					self.install_module_by_pip(module)
-					print 'done.'
-
-			for module in self.py_libs_prefix:
-				module_path = os.path.join(self.py_libs_dir,module)
-				setup_py = os.path.join(module_path,'setup.py')
-				if os.path.exists(module_path) and os.path.exists(setup_py):
-					cmd = "export PYTHONPATH=%s:%s:$PYTHONPATH"%(self.pylib,self.pylib_build)
-					cmd += ";cd %s;python ./setup.py install --prefix=%s"%(module_path,self.pylib)
-					print 'installing [%s] ...'%module
-					syscmd(cmd)
-					print 'done.'
-				else:
-					raise IOError('check if [%s] contains all necessary files;enable the option, --update_db'%module_path)
-		else:
-			raise EnvironmentError("add PYTHONPATH into your shell configuration file.")
 		
+		for module in self.py_modules:
+			if not has_module(module):
+				print 'installing [%s] ...'%module
+				self.install_module_by_pip(module)
+				print 'done.'
+		
+		#download python_lib zip file
+		self.download_data(ucategory='SOURCE')
+
+		for module in self.py_libs_prefix:
+			module_path = os.path.join(self.py_libs_dir,module)
+			setup_py = os.path.join(module_path,'setup.py')
+			if os.path.exists(module_path) and os.path.exists(setup_py):
+				cmd = "export PYTHONPATH=%s:%s"%(self.pylib,self.pylib_build)
+				if self.user_has_pythonpath:
+					cmd += ":$PYTHONPATH"
+					
+				cmd += ";cd %s;python ./setup.py install --prefix=%s"%(module_path,self.pylib)
+				print 'installing [%s] ...'%module
+				syscmd(cmd)
+				print 'done.'
+			else:
+				raise IOError('check if [%s] contains all necessary files;enable the option, --update_db'%module_path)
+
 		print 'python modules are installed successfully in [%s]'%self.pylib
 	
 	def uninstall_python_libs(self):
-		if 'PYTHONPATH' in os.environ:
-			if self.pylib in os.environ['PYTHONPATH']:
-				for module in self.py_libs:
-					if has_module(module):
-						cmd = "pip uninstall -y %s"%module
-						try:
-							print 'uninstalling [%s]'%module
-							syscmd(cmd)
-							print 'done.'
-						except:
-							print "%s may not be installed previously."%module
-					else:
-						print "%s may not be installed previously."%module
-				path2del = os.path.join(self.pylib,'lib')
-				if os.path.exists(path2del):
-					print 'cleaning up python module lib [%s] ...'%path2del
-					shutil.rmtree(path2del)
+
+		for module in self.py_modules:
+			if has_module(module):
+				cmd = "pip uninstall -y %s"%module
+				try:
+					print 'uninstalling [%s]'%module
+					syscmd(cmd)
 					print 'done.'
-					
-				path2del = os.path.join(self.pylib,'bin')
-				if os.path.exists(path2del):
-					print 'cleaning up python module lib [%s] ...'%path2del
-					shutil.rmtree(path2del)
-					print 'done.'
+				except:
+					print "%s may not be installed previously."%module
 			else:
-				print "your PYTHONPATH does not include '%s'."%self.pylib
-		else:
-			print "you do not have an environment variable, PYTHONPATH in your shell configuration file!"
+				print "%s may not be installed previously."%module
+
+		path2del = os.path.join(self.pylib,'lib')
+		if os.path.exists(path2del):
+			print 'cleaning up python module lib [%s] ...'%path2del
+			shutil.rmtree(path2del)
+			print 'done.'
+			
+		path2del = os.path.join(self.pylib,'bin')
+		if os.path.exists(path2del):
+			print 'cleaning up python module lib [%s] ...'%path2del
+			shutil.rmtree(path2del)
+			print 'done.'
 
 		print 'python modules are uninstalled successfully in [%s]'%self.pylib
 	
@@ -233,7 +242,11 @@ class Setup():
 		print "-Then, %s the following variables %s PATH/PYTHONPATH in your shell script (e.g., %s)."%(desc1,desc2,shell_cnf_fn)
 		print hline
 		msg = "%s PATH%s$DIVINE/gcn/bin/prioritize:$PATH\n"%(set_keyword,set_link)
-		msg += "%s PYTHONPATH%s$DIVINE:$PYTHONPATH\n"%(set_keyword,set_link)
+		msg += "%s PYTHONPATH%s$DIVINE"%(set_keyword,set_link)
+		
+		if self.user_has_pythonpath: msg += ":$PYTHONPATH\n"
+		else: msg += "\n"
+		
 		msg += "%s PYTHONPATH%s$DIVINE/%s:$PYTHONPATH\n"%(set_keyword,set_link,self.pylib_prefix)
 		msg += "%s PYTHONPATH%s$DIVINE/%s/%s/%s/%s:$PYTHONPATH\n"%\
 			(set_keyword,set_link,self.pylib_prefix,'lib',get_pylib_prefix(),self.pylib_build_prefix)
@@ -258,8 +271,11 @@ def main():
 		if not check_network_on():
 			raise RuntimeError('it requires network connection to setup Divine!')
 		cs.install_python_libs()
+		cs.download_data(ucategory='EXAMPLE')
+		
 		if args.update_db:
-			cs.download_data()
+			cs.download_data(ucategory='DATA')
+			cs.download_data(ucategory='DATA_DELTA')
 		cs.msg_config('install')
 	elif args.uninstall:
 		cs.uninstall_python_libs()

@@ -29,11 +29,8 @@ https://github.com/cjhong/divine
 - Linux, 4 GB RAM, and 130 GB available hard disk space
 - python 2.7+
 - make sure that 'pip', 'wget' (with Internet connection), 'grep', 'awk', and 'sort' command in $PATH
-- locate your shell configuration file (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc) and add 'PYTHONPATH' into the configuration file if it does not exist. For example,
-
-```
-export PYTHONPATH=$HOME/apps/python_libs:$PYTHONPATH
-```
+- locate your shell configuration file (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc)
+- We encourage install Divine with a normal user account. It does not require super user (root) account.
 
 ## Python modules to be installed
 Divine requires the following modules but, during the setup process, the modules will be installed automatically if necessary.
@@ -61,12 +58,11 @@ $ setup.py --install --update_db
 
 ### Optional 2: only reinstall python modules of dependency
 ```
-(optional)$ setup.py --uninstall
 $ setup.py --install
 ```
 
 ## Configuration
-- Get environment variables (DIVINE,PATH,PYTHONPATH) at the end of the installation setup message. Then,
+- Get updated environment variables (PATH, DIVINE, and PYTHONPATH) at the end of the installation setup message. Then,
 
 - Add the environment variables into your shell configuration (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc)
 
@@ -257,11 +253,12 @@ optional arguments:
 
 - Q.2: I don't like a default filtering scheme used in Divine. I want my own filtering strategy (e.g., include a certain flag in FILTER; not to use ExAC; 0.03 for MAF cutoff).
 
-- A.2: open $DIVINE/gcn/config/filterconf.txt and edit the configuration file. For example, set `excl=LowQual` to filter out all LowQual in the VCF file. Later, we will provide more comprehensive instruction for this file. The default configuration is
+- A.2: open $DIVINE/gcn/config/filterconf.txt and edit the configuration file. For example, set `excl=LowQual` to filter out all LowQual in the VCF file. Specify the option with `-c` in Divine option. Later, we will provide more comprehensive instruction for this file. The default configuration is
 
 ```
 [fltr]
-excl=LowQual
+excl=LowDP:LowGQ:LowGQX:LowQual:IndelGap:SnpGap
+#incl=PASS
 [infoflag]
 excl=DB137
 [infoval]
@@ -271,6 +268,7 @@ exacaf=yes
 splice_dist=20
 hgmd_filter=2
 regulome=no
+#min_depth=10
 [reg]
 incl=CodingExonic:NonCodingExonic:CodingIntronic:NonCodingIntronic
 [freq]
