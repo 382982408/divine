@@ -96,7 +96,7 @@ class Divine:
 		job_name = '_set_args'
 		lib_utils.msgout('notice','storing input condition ...',job_name)
 		
-		if not uargs.hpo_query_fn and not uargs.cf_fn:
+		if not uargs.hpo_query_fn and not uargs.vcf:
 			raise RuntimeError('either VCF (-v) or query phenotype (-q) file should be provided!')
 
 		# check sanity of the input files
@@ -861,14 +861,16 @@ class Divine:
 			(self.hpo_query, self.vcf, job_name)
 		lib_utils.msgout('notice',msg);self.logger.info(msg)
 		
-		if self.dm.seed_rate>0.:
+		pheno_info = False
+		if self.pheno_dmg and self.dm.seed_rate>0.:
+			pheno_info = True
 			#to select perturbed genes whose GO is highly similar to phenotype genes 
 			self.gene_ontology_enrichment()
 
 		# to obtain min damage score for both pheno and genetic perturb
-		pdmg_min = lib_utils.get_stat_dic(self.pheno_dmg, 'min')
-		if pdmg_min == 0.:
-			raise ValueError('pheno has 0 dmg score[self.pheno_dmg]')
+			pdmg_min = lib_utils.get_stat_dic(self.pheno_dmg, 'min')
+			if pdmg_min == 0.:
+				raise ValueError('pheno has 0 dmg score[self.pheno_dmg]')
 			
 		gdmg_min = lib_utils.get_stat_dic(self.genetic_dmg, 'min')
 		if gdmg_min == 0.:
@@ -878,18 +880,22 @@ class Divine:
 		lib_utils.msgout('notice',msg,job_name);self.logger.info(msg)
 		
 		for gene in self.genetic_dmg.keys():
-			self.gene_dmg[gene] = PerturbedGene()
-			pdmg = pdmg_min * self.dm.prior
-			if gene in self.pheno_dmg:
-				pdmg = self.pheno_dmg[gene]
-			pdmg *= self.dm.ptwt
 			
+			self.gene_dmg[gene] = PerturbedGene()
 			gdmg = self.genetic_dmg[gene]
 			self.gene_dmg[gene].gdmg = gdmg
-
 			gdmg *= self.dm.gtwt
-			self.gene_dmg[gene].score = pdmg * gdmg / (pdmg * gdmg \
-																					+ (1. - pdmg) * (1. - gdmg))
+			
+			if pheno_info:
+				pdmg = pdmg_min * self.dm.prior
+				if gene in self.pheno_dmg:
+					pdmg = self.pheno_dmg[gene]
+				pdmg *= self.dm.ptwt
+				
+				self.gene_dmg[gene].score = pdmg * gdmg / (pdmg * gdmg \
+																		+ (1. - pdmg) * (1. - gdmg))
+			else:
+				self.gene_dmg[gene].score = gdmg
 
 			#skip normalization since it will be done in heat_diffusion
 			

@@ -1034,6 +1034,9 @@ def add_annotation(vcf, rec, annotations):
 
 
 def main(vcffile, outfile, capture_kit_name, probe_flanking_bp, hgmd_on, logger):
+    msg = "Annotation on [%s] in progress. Be patient (30 min+) ..."%vcffile
+    print msg
+    
     vcf = VCFParser(vcffile)
     outstream = open(outfile, 'w')
 

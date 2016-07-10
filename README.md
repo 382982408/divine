@@ -67,8 +67,7 @@ $ setup.py --install
 - Add the environment variables into your shell configuration (e.g., $HOME/.bash_profile, $HOME/.profile, or $HOME/.cshrc)
 
 - Make sure that the new configuration is applied by
-  - logoff and login your account
-
+  - logoff and login your account, or
   - running
   ```
   $ source $HOME/your_shell_config_file
